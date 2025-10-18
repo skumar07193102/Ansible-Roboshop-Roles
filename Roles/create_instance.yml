@@ -1,0 +1,21 @@
+- name: "create ec2 instance and route53"
+  hosts: local
+  connection: local
+  vars:
+   ami_id: "ami-09c813fb71547fc4f"
+   sg_id: "sg-02a575ca32ec8ed6b"
+   hosting_zone: Z02845132921NLJI9M7EG
+   domain_name: "devsecops86s.space"
+   instances:
+   - catalogue
+   - mongodb
+   - redis
+   - mysql
+   - shipping
+   - payment
+   - user
+   - cart
+   - rabbitmq
+   - frontend
+   roles:
+   - instance_creation
