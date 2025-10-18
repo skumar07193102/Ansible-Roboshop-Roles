@@ -1,0 +1,18 @@
+  - name: copy the mongo.repo to repo folder
+    ansible.builtin.copy:
+      src: mongo.repo
+      dest: /etc/yum.repos.d/mongo.repo
+  - name: install the mongodb package
+    ansible.builtin.package:
+      name: mongodb-org
+      state: present
+  - name: Replace the IP to 0.0.0.0
+    ansible.builtin.replace:
+      path: /etc/mongod.conf
+      regexp: '127.0.0.1'
+      replace: '0.0.0.0'
+  - name: Start and enable the service
+    ansible.builtin.service:
+      name: mongod
+      state: started
+      enabled: yes

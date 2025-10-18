@@ -1,0 +1,55 @@
+  - name: install the nodejs 20v package
+    ansible.builtin.command: dnf module install nodejs:20 -y
+  - name: create the roboshop system user
+    ansible.builtin.user:
+      name: roboshop
+      comment: creation of system user
+      system: true
+      shell: /sbin/nologin
+      home: /app
+  - name: create the /app directory
+    ansible.builtin.file:
+      path: /app
+      state: directory
+  - name: downlaod the code to /tmp/catalogue.zip file
+    ansible.builtin.get_url:
+      url: https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip
+      dest: /tmp/catalogue.zip
+  - name: extract the files from /tmp/cataologue.zip to /app
+    ansible.builtin.unarchive:
+      src: /tmp/catalogue.zip
+      dest: /app
+      remote_src: yes
+  - name: install npm dependencies
+    community.general.npm:
+      path : /app
+  - name: copy the catalogue.service to /etc/systemd/system
+    ansible.builtin.copy:
+      src: catalogue.service
+      dest: /etc/systemd/system/catalogue.service
+  - name: copy the mongo.repo to /etc/yum.repos.d/mongo.repo
+    ansible.builtin.copy:
+      src: mongo.repo
+      dest: /etc/yum.repos.d/mongo.repo
+  - name: install mongosh client
+    ansible.builtin.package:
+      name: mongodb-mongosh
+      state: present
+  - name: evaluate the catalog in DB
+    ansible.builtin.command: mongosh --host mongodb.devsecops86s.space --quiet --eval "db.getMongo().getDBNames().indexOf('catalogue')"
+    register: catalogue_output
+
+  - name: print the catalogue_output
+    ansible.builtin.debug:
+      msg: "{{ catalogue_output }}"
+
+  - name: load the catalog products to mongo Db if there is product data
+    ansible.builtin.shell: mongosh --host mongodb.devsecops86s.space </app/db/master-data.js
+    when: catalogue_output.stdout | int < 0
+
+  - name: catalogue service daemon-reload, start and enable
+    ansible.builtin.systemd_service:
+      name: catalogue
+      daemon_reload: true
+      state: started
+      enabled: yes
