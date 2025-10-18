@@ -17,5 +17,5 @@
    - cart
    - rabbitmq
    - frontend
-   roles:
-   - instance_creation
+  roles:
+  - instance_creation
