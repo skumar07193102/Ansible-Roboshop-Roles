@@ -1,3 +1,7 @@
+- name: remove /etc/systemd/system/{{ component }}.service
+  ansible.builtin.file:
+    path: /etc/systemd/system/{{ component }}.service
+    state: absent
 - name: copy the catalogue.service to /etc/systemd/system
   ansible.builtin.copy:
     src: "{{ component }}.service"
