@@ -1,0 +1,10 @@
+- name: install the python package
+  ansible.builtin.command: dnf install python3 gcc python3-devel -y
+- name: setup the payment module
+  ansible.builtin.import_role:
+    name: common
+    tasks_from: python
+- name: setup the payment service
+  ansible.builtin.import_role:
+    name: common
+    tasks_from: service_setup
