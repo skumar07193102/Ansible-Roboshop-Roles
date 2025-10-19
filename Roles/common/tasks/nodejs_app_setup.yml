@@ -11,17 +11,17 @@
   ansible.builtin.file:
     path: /app
     state: directory
-- name: remove the /tmp/{{ item }}.zip directory
+- name: remove the /tmp/{{ component }}.zip directory
   ansible.builtin.file:
-    path: /tmp/{{ item }}.zip
+    path: /tmp/{{ component }}.zip
     state: absent
-- name: downlaod the code to /tmp/{{ item }}.zip file
+- name: downlaod the code to /tmp/{{ component }}.zip file
   ansible.builtin.get_url:
-    url: https://roboshop-artifacts.s3.amazonaws.com/{{ item }}-v3.zip
-    dest: /tmp/{{ item }}.zip
+    url: https://roboshop-artifacts.s3.amazonaws.com/{{ component }}-v3.zip
+    dest: /tmp/{{ component }}.zip
 - name: extract the files from /tmp/cataologue.zip to /app
   ansible.builtin.unarchive:
-    src: /tmp/{{ item }}.zip
+    src: /tmp/{{ component }}.zip
     dest: /app
     remote_src: yes
 - name: install npm dependencies
