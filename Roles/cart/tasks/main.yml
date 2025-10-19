@@ -1,43 +1,8 @@
-  - name: install nodejs
-    ansible.builtin.command: dnf module install nodejs:20 -y
-  - name: create system user
-    ansible.builtin.user:
-      name: roboshop
-      comment: " create system user"
-      system: true
-      shell: /sbin/nologin
-      home: /app
-  - name: remove the existing /app directory
-    ansible.builtin.file:
-      path: /app
-      state: absent
-  - name: create the /app directory
-    ansible.builtin.file:
-      path: /app
-      state: directory
-  - name: remove the /tmp.cart.zip directory
-    ansible.builtin.file:
-      path: /tmp/cart.zip
-      state: absent
-  - name: download the cart app code to /tmp/cart.zip directory
-    ansible.builtin.get_url:
-      url: "https://roboshop-artifacts.s3.amazonaws.com/cart-v3.zip"
-      dest: /tmp/cart.zip
-  - name: unarchive the zip folder to /app
-    ansible.builtin.unarchive:
-      src: /tmp/cart.zip
-      dest: /app
-      remote_src: yes
-  - name: install npm dependencies
-    community.general.npm:
-      path: /app
-  - name: copy the cart.service to systemd path
-    ansible.builtin.copy:
-      src: cart.service
-      dest: /etc/systemd/system/cart.service
-  - name: reload and start the service
-    ansible.builtin.systemd_service:
-      name: cart
-      daemon_reload: true
-      enabled: yes
-      state: started
+- name: setup the user module
+  ansible.builtin.import_role:
+    name: common
+    tasks_from: nodejs_app_setup
+- name: setup the user module
+  ansible.builtin.import_role:
+    name: common
+    tasks_from: service_setup
