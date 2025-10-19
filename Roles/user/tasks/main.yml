@@ -1,44 +1,8 @@
-  - name: install the nodejs:20 package
-    ansible.builtin.command: dnf module install nodejs:20 -y
-  - name: create the system user roboshop
-    ansible.builtin.user:
-      name: roboshop
-      comment: system user
-      system: true
-      home: /app
-      shell: /sbin/nologin
-  - name: remove the existing directory /app
-    ansible.builtin.file:
-      path: /app
-      state: absent
-  - name: create the /app directory
-    ansible.builtin.file:
-      path: /app
-      state: directory
-  - name: remove the /tmp/user.zip
-    ansible.builtin.file:
-      path: /tmp/user.zip
-      state: absent
-  - name: Download the user.zip code to /tmp
-    ansible.builtin.get_url:
-      url: "https://roboshop-artifacts.s3.amazonaws.com/user-v3.zip"
-      dest: /tmp/user.zip
-  - name: Unarchive the user.zip to /app folder
-    ansible.builtin.unarchive:
-      src: /tmp/user.zip
-      dest: /app
-      remote_src: yes
-  - name: install the npm dependencies
-    community.general.npm:
-      path: /app
-      state: present
-  - name: copy the user.service file content to systemd path
-    ansible.builtin.copy:
-      src: user.service
-      dest: /etc/systemd/system/user.service
-  - name: user service deamon reload and service start
-    ansible.builtin.systemd_service:
-      name: user
-      daemon_reload: true
-      enabled: yes
-      state: started
+- name: setup the user module
+  ansible.builtin.import_role:
+    name: common
+    tasks_from: nodejs_app_setup
+- name: setup the user module
+  ansible.builtin.import_role:
+    name: common
+    tasks_from: service_setup
