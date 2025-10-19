@@ -1,0 +1,43 @@
+- name: install the maven and mysql
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: present
+  loop:
+  - maven
+  - mysql
+- name: create system user
+  ansible.builtin.user:
+    name: roboshop
+    comment: " create system user"
+    system: true
+    shell: /sbin/nologin
+    home: /app
+- name: remove the existing /app directory
+  ansible.builtin.file:
+    path: /app
+    state: absent
+- name: create the /app directory
+  ansible.builtin.file:
+    path: /app
+    state: directory
+- name: remove the /tmp/{{ component }}.zip directory
+  ansible.builtin.file:
+    path: /tmp/{{ component }}.zip
+    state: absent
+- name: download the {{ component }} app code to /tmp/{{ component }}.zip directory
+  ansible.builtin.get_url:
+    url: "https://roboshop-artifacts.s3.amazonaws.com/{{ component }}-v3.zip"
+    dest: /tmp/{{ component }}.zip
+- name: unarchive the zip folder to /app
+  ansible.builtin.unarchive:
+    src: /tmp/{{ component }}.zip
+    dest: /app
+    remote_src: yes
+- name: install maven dependencies
+  ansible.builtin.command: mvn clean package
+  args:
+    chdir: /app
+- name: rename the file shipping-1.0.jar to shipping.jar
+  ansible.builtin.command: mv target/shipping-1.0.jar shipping.jar
+  args:
+    chdir: /app
