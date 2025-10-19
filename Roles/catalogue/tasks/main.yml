@@ -11,11 +11,15 @@
     ansible.builtin.file:
       path: /app
       state: directory
+  - name: remove the /tmp/catalogue.zip directory
+    ansible.builtin.file:
+      path: /tmp/catalogue.zip
+      state: absent
   - name: downlaod the code to /tmp/catalogue.zip file
     ansible.builtin.get_url:
       url: https://roboshop-artifacts.s3.amazonaws.com/catalogue-v3.zip
       dest: /tmp/catalogue.zip
-  - name: extract the files from /tmp/cataologue.zip to /app
+  - name: extract the files from /tmp/catalogue.zip to /app
     ansible.builtin.unarchive:
       src: /tmp/catalogue.zip
       dest: /app
