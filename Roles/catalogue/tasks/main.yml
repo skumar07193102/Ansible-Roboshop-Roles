@@ -7,9 +7,7 @@
     src: mongo.repo
     dest: /etc/yum.repos.d/mongo.repo
 - name: install mongosh client
-  ansible.builtin.package:
-    name: mongodb-mongosh
-    state: present
+  ansible.builtin.command: dnf install mongodb-mongosh -y
 - name: evaluate the catalog in DB
   ansible.builtin.command: mongosh --host mongodb.devsecops86s.space --quiet --eval "db.getMongo().getDBNames().indexOf('catalogue')"
   register: catalogue_output
@@ -21,7 +19,7 @@
 - name: load the catalog products to mongo Db if there is product data
   ansible.builtin.shell: mongosh --host mongodb.devsecops86s.space </app/db/master-data.js
   when: catalogue_output.stdout | int < 0
-  
+
 - name: Setup the service setup
   ansible.builtin.import_role:
     name: common
